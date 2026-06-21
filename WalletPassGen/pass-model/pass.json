@@ -1,0 +1,15 @@
+{
+  "formatVersion": 1,
+  "passTypeIdentifier": "pass.placeholder",
+  "serialNumber": "placeholder",
+  "teamIdentifier": "PLACEHOLDER",
+  "organizationName": "My Organization",
+  "description": "My Pass",
+  "generic": {
+    "headerFields": [],
+    "primaryFields": [],
+    "secondaryFields": [],
+    "auxiliaryFields": [],
+    "backFields": []
+  }
+}

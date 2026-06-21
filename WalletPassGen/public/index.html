@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet Pass Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Wallet Pass Generator</h1>
+      <p>Create an Apple Wallet pass from any image</p>
+    </header>
+
+    <div id="cert-warning" class="cert-warning hidden">
+      <strong>Missing certificates:</strong> <span id="cert-warning-detail"></span>
+      <a href="#setup">See setup instructions below.</a>
+    </div>
+
+    <form id="pass-form">
+      <!-- Image upload -->
+      <section class="card">
+        <h2>1. Your Image</h2>
+        <div id="drop-zone" class="drop-zone">
+          <div class="drop-zone-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <p>Drop your JPG here or <label for="image-input" class="file-label">browse</label></p>
+            <p class="hint">JPG, PNG — up to 20 MB</p>
+          </div>
+          <img id="preview" class="hidden" alt="Preview">
+        </div>
+        <input type="file" id="image-input" name="image" accept="image/*" required>
+      </section>
+
+      <!-- Pass identity -->
+      <section class="card">
+        <h2>2. Pass Identity <span class="required-note">(from your Apple Developer account)</span></h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="passTypeIdentifier">Pass Type Identifier</label>
+            <input type="text" id="passTypeIdentifier" name="passTypeIdentifier"
+              placeholder="pass.com.yourcompany.yourpass" required>
+          </div>
+          <div class="field">
+            <label for="teamIdentifier">Team Identifier</label>
+            <input type="text" id="teamIdentifier" name="teamIdentifier"
+              placeholder="ABCDE12345" maxlength="10" required>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description"
+              value="My Pass" placeholder="My Pass">
+          </div>
+          <div class="field">
+            <label for="organizationName">Organization Name</label>
+            <input type="text" id="organizationName" name="organizationName"
+              value="My Organization" placeholder="My Organization">
+          </div>
+        </div>
+        <div class="field passphrase-field">
+          <label for="passphrase">Certificate Key Passphrase <span class="optional">(if any)</span></label>
+          <input type="password" id="passphrase" name="passphrase" placeholder="Leave blank if none">
+        </div>
+      </section>
+
+      <!-- Colors -->
+      <section class="card">
+        <h2>3. Colours</h2>
+        <div class="color-row">
+          <div class="color-field">
+            <label for="backgroundColor">Background</label>
+            <div class="color-input-wrap">
+              <input type="color" id="backgroundColor" value="#ffffff">
+              <span id="backgroundColor-hex">#ffffff</span>
+            </div>
+            <p class="hint">Pass frame colour</p>
+          </div>
+          <div class="color-field">
+            <label for="foregroundColor">Text</label>
+            <div class="color-input-wrap">
+              <input type="color" id="foregroundColor" value="#000000">
+              <span id="foregroundColor-hex">#000000</span>
+            </div>
+            <p class="hint">Primary text colour</p>
+          </div>
+          <div class="color-field">
+            <label for="labelColor">Label</label>
+            <div class="color-input-wrap">
+              <input type="color" id="labelColor" value="#666666">
+              <span id="labelColor-hex">#666666</span>
+            </div>
+            <p class="hint">Field label colour</p>
+          </div>
+        </div>
+
+        <!-- Mini pass preview -->
+        <div class="pass-preview-wrap">
+          <p class="hint">Preview (approximate)</p>
+          <div class="pass-preview" id="pass-preview">
+            <div class="pass-preview-img" id="preview-bg"></div>
+          </div>
+        </div>
+      </section>
+
+      <button type="submit" id="generate-btn" class="generate-btn">
+        <span id="btn-label">Generate .pkpass</span>
+        <span id="btn-spinner" class="spinner hidden"></span>
+      </button>
+
+      <p id="error-msg" class="error-msg hidden"></p>
+    </form>
+
+    <!-- Setup instructions -->
+    <section class="card setup" id="setup">
+      <h2>Certificate Setup</h2>
+      <p>Apple requires a signed certificate to install passes on iOS. You'll need an
+        <strong>Apple Developer account</strong> ($99/yr).</p>
+      <ol>
+        <li>In <a href="https://developer.apple.com/account/resources/identifiers/list/passTypeId" target="_blank">Apple Developer Portal</a>,
+          create a <strong>Pass Type ID</strong> (e.g. <code>pass.com.you.mypass</code>).</li>
+        <li>Generate and download the <strong>Pass Type ID Certificate</strong> (.cer file).</li>
+        <li>
+          Convert it to PEM format and export the private key:
+          <pre>openssl x509 -inform DER -in Certificates.cer -out certs/signerCert.pem
+# Export private key from Keychain (right-click → Export → .p12), then:
+openssl pkcs12 -in Certificates.p12 -nocerts -nodes -out certs/signerKey.pem</pre>
+        </li>
+        <li>
+          Download the Apple WWDR G4 CA certificate:
+          <pre>curl -o certs/wwdr.pem https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer
+# If it downloads as DER format, convert it:
+openssl x509 -inform DER -in certs/wwdr.pem -out certs/wwdr.pem</pre>
+        </li>
+        <li>Place all three files in the <code>certs/</code> folder next to <code>server.js</code>.</li>
+      </ol>
+      <p>Your <code>certs/</code> folder is git-ignored — certificates never leave your machine.</p>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
