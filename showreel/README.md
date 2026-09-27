@@ -10,11 +10,12 @@ Every frame is a pure function of time: springs, easings and closed-form paths, 
 
 | Time | Section | What moves |
 |------|---------|------------|
-| 0.00 | **Hi! I'm Thom Bailly.** | The name rises in; on the break the full stop hops off, bounces, squashes into a line and opens the page on the drop |
-| 3.69 | **What I do** | Three areas, one bar each: Commercial Transformation ("30%+ revenue lift, before your next hire."), European Market Expansion ("18 months of expensive lessons, saved."), Enterprise Negotiation Training ("Higher ASP. Protected margins.") |
-| 9.22 | **Credentials** | Microsoft, Pinterest, Twitter and Yahoo cut in one per beat, then line up over "$300M revenue restructured." and collapse into a single point |
-| 12.90 | **5 continents** | The point grows into a globe; routes fly out of London and the count rolls 1 → 5 |
-| 15.67 | **Taking your growth strategy from good to unparalleled.** | The globe collapses, the page irises open, and the ball lands as the full stop on the song's final hit; "Let's talk" follows |
+| 0.00 | **Hi! I'm Thom Bailly, and I do…** | The name rises in; the three dots land on the beat, and the last one swells into the next page |
+| 2.30 | **Three areas** | Three beats each, title filling the width plus one benefit: Commercial Transformation ("+30% revenue. Same team."), European Market Expansion ("Europe, 18 months faster."), Enterprise Negotiation Training ("Bigger deals. Protected margins.") |
+| 6.45 | **Credentials** | One card: Microsoft, Pinterest, Twitter and Yahoo land one per beat |
+| 8.76 | **$300M, revenue restructured** | The odometer rolls to $300M as the bars spring up and the curve draws itself; the camera pushes into the last data point |
+| 12.44 | **5 continents** | The data point becomes a globe; routes fly out of London and the count rolls 1 → 5 |
+| 15.21 | **Taking your growth strategy from good to unparalleled.** | The globe collapses, the page irises open, and the ball lands as the full stop on the song's final hit; "Let's talk" follows |
 
 ## Brand
 

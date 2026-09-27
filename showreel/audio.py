@@ -2,8 +2,8 @@
 """Cuts the reel's soundtrack from "Boardroom Drift" and adds one sound-design touch.
 
 The track sits on a fixed 130.2 BPM grid (beat 0.4608572s). The 20s cut starts on
-beat 86 (40.591s): the break bar carries the bouncing full stop, the drop lands as the
-page opens at 3.687s, and the song's final hit at 18.435s lands the closing full stop.
+beat 86 (40.591s), one bar before the track's last break; the song's final hit at
+18.435s lands the closing full stop.
 Every visual cue in index.html is placed on this same grid.
 
     python3 audio.py path/to/Boardroom_Drift.mp3     -> reel.wav (20s, 48 kHz, 16-bit stereo)
@@ -22,7 +22,7 @@ DUR = 20.0
 N = int(SR * DUR)
 BEAT = 0.4608571671960374
 START = 0.9567618236322547 + 86 * BEAT          # beat 86 of the track, 40.591s
-T_GLOBE, T_END = 28 * BEAT, 34 * BEAT
+T_GLOBE, T_END = 27 * BEAT, 33 * BEAT
 CONV = T_GLOBE + 5 * BEAT                           # globe collapses into one point
 rng = np.random.default_rng(7)
 
