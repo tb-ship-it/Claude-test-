@@ -1,37 +1,33 @@
-# Claude — Motion Reel 2026
+# Thom Bailly — 15-second reel
 
-A 15-second, 1080p60 motion-design showreel, styled after [consulting.thomasbailly.com](https://consulting.thomasbailly.com).
+A 15-second, 1080p60 promo in the visual language of [consulting.thomasbailly.com](https://consulting.thomasbailly.com), cut to "Boardroom Drift".
 
 **Watch:** `showreel.mp4`, or open `index.html` through any static server and click to play it live in the browser.
 
-Every frame is a pure function of time. No keyframes, no timeline, no plugins: springs, easings and closed-form paths on a 128 BPM grid. 8 bars of 1.875s is exactly 15.000s, and the score is synthesised on the same grid, so every cut, hit and bounce lands on the beat.
+Every frame is a pure function of time: springs, easings and closed-form paths, with no keyframes. All cues sit on the track's own beat grid (130.2 BPM). The cut starts 42.434s into the song, one bar before a drop.
 
-## Chapters
+## Structure
 
-| # | Time | Chapter | Technique on show |
-|---|------|---------|-------------------|
-| 01 | 0.00 | Squash & stretch | Physically timed bounces, onion skins, impact rings; the ball stretches into a line that opens the page |
-| 02 | 1.88 | Kinetic type | The site's own hero line. Variable-weight reflow (200 to 800), masked reveals, a strike-through, and a full stop that is a bouncing ball |
-| 03 | 3.75 | Shape morph | 240-point path morphs with time-lagged echoes, selection handles and a live graph editor |
-| 04 | 5.63 | Data in motion | Spring-loaded bars, self-drawing curve, odometer counter, then a push into the data point |
-| 05 | 7.50 | 3D + arcs | The data point becomes a 5,200-dot globe (real land mask) with great-circle routes out of London |
-| 06 | 9.38 | Particles | The globe's own dots fly into the word GROWTH, then detonate on the beat |
-| 07 | 11.25 | The edit | Eight cuts on eighth notes: tile flips, marquees, glitch, squash, echo stacks |
-| 08 | 13.13 | Resolve | A match cut through the O of "YOUR MOVE" into an end card in the site's hero language, with a CTA click |
+| Time | Message | What moves |
+|------|---------|------------|
+| 0.00 | (intro) | A blue ball bounces on the break's beats, squashes into a line on the build, and the line opens the page on the drop |
+| 1.84 | **$300M, revenue restructured** | An odometer rolls to $300M as the bars spring up and the curve draws itself; then the camera pushes into the last data point |
+| 5.53 | **5 continents** | The data point becomes a globe; routes fly out of London and the count rolls 1 → 5 as each continent is reached |
+| 10.14 | **Hi! I'm Thom Bailly, and I can transform your growth strategy from good to unparalleled.** | The globe collapses into one point, the page irises open, and that point lands as the full stop; the cursor clicks "Let's talk" |
 
 ## Brand
 
-Sampled from the live site: blue `#0073D1`, ink `#030712`, body grey `#6B7280`, white, tile grey `#EFEFEF`. Stretch tones: sky `#4FB0FF` and panel navy `#0D1526`. Type: Bricolage Grotesque (display, synthetic italic for the blue accents), Inter Tight (body), JetBrains Mono (HUD). All fonts are OFL and bundled in `fonts/`.
+Sampled from the live site: blue `#0073D1`, ink `#030712`, body grey `#6B7280`, white. One stretch tone: sky `#4FB0FF`. Type: Bricolage Grotesque (display, synthetic italic for the blue accents), Inter Tight (button), JetBrains Mono (labels). All fonts are OFL and bundled in `fonts/`.
 
 ## Rebuild
 
 ```sh
-pip install numpy scipy pyloudnorm imageio-ffmpeg
-python3 audio.py                     # -> reel.wav (score, mastered to -12 LUFS)
-ffmpeg -i reel.wav -c:a aac -b:a 192k reel.m4a   # audio for the live player
-npm i -g playwright                  # or point NODE_PATH at an existing install
-node render.cjs                      # -> showreel.mp4 (6-sample motion blur)
-node render.cjs --stills=2.5,8.6 --sub=1   # quick PNG checks
+pip install numpy scipy imageio-ffmpeg
+python3 audio.py path/to/Boardroom_Drift.mp3     # -> reel.wav (the 15s cut + click and whoosh)
+ffmpeg -i reel.wav -c:a aac -b:a 192k reel.m4a    # audio for the live player
+npm i -g playwright                               # or point NODE_PATH at an existing install
+node render.cjs                                   # -> showreel.mp4 (6-sample motion blur)
+node render.cjs --stills=2.5,8.1 --sub=1          # quick PNG checks
 ```
 
-`render.cjs` accepts `--chrome=<path>` and `--ffmpeg=<path>` when those aren't on `PATH`.
+The full track isn't in the repo, so pass its path to `audio.py`. `render.cjs` accepts `--chrome=<path>` and `--ffmpeg=<path>` when those aren't on `PATH`.
