@@ -4,17 +4,17 @@ A 20-second, 1080p60 promo in the visual language of [consulting.thomasbailly.co
 
 **Watch:** `showreel.mp4`, or open `index.html` through any static server and click to play it live in the browser.
 
-Every frame is a pure function of time: springs, easings and closed-form paths, with no keyframes. All cues sit on the track's own beat grid (130.2 BPM). The cut runs from 39.208s into the song to its final hit.
+Every frame is a pure function of time: springs, easings and closed-form paths, with no keyframes. All cues sit on the track's own beat grid (130.2 BPM). The cut runs from 40.591s into the song, one bar before its last break, through its final hit.
 
 ## Structure
 
-| Time | Message | What moves |
+| Time | Section | What moves |
 |------|---------|------------|
-| 0.00 | **Experience** | Microsoft, Pinterest, Twitter and Yahoo cut in one per beat, then line up together |
-| 2.77 | (transition) | The logos collapse into a blue ball that bounces through the break, squashes into a line, and opens the page on the drop |
-| 5.07 | **$300M, revenue restructured** | An odometer rolls to $300M as the bars spring up and the curve draws itself; then the camera pushes into the last data point |
-| 8.76 | **5 continents** | The data point becomes a globe; routes fly out of London and the count rolls 1 → 5 as each continent is reached |
-| 14.29 | **Hi! I'm Thom Bailly, and I can transform your growth strategy from good to unparalleled.** | The globe collapses into one point, the page irises open, and that point lands as the full stop; the cursor clicks "Let's talk"; the song's final hit rings out |
+| 0.00 | **Hi! I'm Thom Bailly.** | The name rises in; on the break the full stop hops off, bounces, squashes into a line and opens the page on the drop |
+| 3.69 | **What I do** | Three areas, one bar each: Commercial Transformation ("30%+ revenue lift, before your next hire."), European Market Expansion ("18 months of expensive lessons, saved."), Enterprise Negotiation Training ("Higher ASP. Protected margins.") |
+| 9.22 | **Credentials** | Microsoft, Pinterest, Twitter and Yahoo cut in one per beat, then line up over "$300M revenue restructured." and collapse into a single point |
+| 12.90 | **5 continents** | The point grows into a globe; routes fly out of London and the count rolls 1 → 5 |
+| 15.67 | **Taking your growth strategy from good to unparalleled.** | The globe collapses, the page irises open, and the ball lands as the full stop on the song's final hit; "Let's talk" follows |
 
 ## Brand
 
@@ -26,7 +26,7 @@ Company logos come from the CC0 [gilbarbara/logos](https://github.com/gilbarbara
 
 ```sh
 pip install numpy scipy imageio-ffmpeg
-python3 audio.py path/to/Boardroom_Drift.mp3     # -> reel.wav (the 20s cut + click and whoosh)
+python3 audio.py path/to/Boardroom_Drift.mp3     # -> reel.wav (the 20s cut + one whoosh)
 ffmpeg -i reel.wav -c:a aac -b:a 192k reel.m4a    # audio for the live player
 npm i -g playwright                               # or point NODE_PATH at an existing install
 node render.cjs                                   # -> showreel.mp4 (6-sample motion blur)
