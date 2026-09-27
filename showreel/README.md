@@ -13,8 +13,8 @@ Every frame is a pure function of time: springs, easings and closed-form paths, 
 | 0.00 | **Hi! I'm Thom Bailly, and I do…** | The name rises in; the three dots land on the beat, and the last one swells into the next page |
 | 2.30 | **Three areas** | One bar each, title filling the width plus one benefit: Commercial Transformation ("Up to +30% revenue. Same team."), European Market Expansion ("Get Europe right, up to 18 months faster."), Enterprise Negotiation Training ("Bigger AOV. Protected margins.") |
 | 7.84 | **Credentials** | One card: Microsoft, Pinterest, Twitter and Yahoo land one per beat |
-| 10.14 | **$300M, revenue restructured** | The counter grows exponentially from $1M, racing to $300M on the beat, then holds; the bars spring up and the curve races with it; the camera pushes into the last data point |
-| 13.83 | **5 continents** | The data point becomes a globe that opens on London, turns west for Paris, New York and Mexico City, then whips east for Tokyo and Sydney; the count rolls 1 → 5 |
+| 10.14 | **$300M, revenue restructured** | The counter grows exponentially from $1M, racing to $300M on the beat, then holds under "Revenue restructured."; the bars spring up and the curve races with it; the camera pushes into the last data point |
+| 13.83 | **5 continents** | The data point becomes a globe that opens on London, turns west for Paris, New York and Mexico City, then whips east for Dubai, Tokyo and Sydney; the count rolls 1 → 5 |
 | 17.05 | **Taking your growth strategy from good to unparalleled.** | The globe collapses, the page irises open, and the ball lands as the full stop on the song's final hit; "Let's talk" follows |
 
 ## Brand

@@ -29,7 +29,7 @@ canvas{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;display:block}
      02.304  what I do       — three areas, one bar each, one clear benefit
      07.835  credentials     — one card: Microsoft, Pinterest, Twitter, Yahoo, one per beat
      10.139  $300M           — $1M to $300M, exponentially, then it holds: revenue, restructured
-     13.826  5 continents    — London to Paris, New York, Mexico City, Tokyo, Sydney
+     13.826  5 continents    — London to Paris, New York, Mexico City, Dubai, Tokyo, Sydney
      17.052  the finish      — "Taking your growth strategy from good to unparalleled."
                                the ball lands as the full stop on the song's final hit
    ===================================================================== */
@@ -292,7 +292,7 @@ function sRevenue(ctx,lt){
   setFont(ctx,800,SZ,DISP); ctx.fillStyle=C.ink; ctx.fillText('M',130+dw+8+3*cw+6,BASE);
   ctx.restore();
   // the message
-  [['Revenue,',665,0],['restructured.',777,.1]].forEach(([s,y,d])=>{
+  [['Revenue',665,0],['restructured.',777,.1]].forEach(([s,y,d])=>{
     ctx.save(); ctx.globalAlpha*=la; ctx.beginPath(); ctx.rect(0,y-102,880,134); ctx.clip();
     txt(ctx,s,130,y+(1-spring(lt-2*BEAT-d,1.8,.62))*140,{fam:DISP,w:800,s:96,it:true,color:C.blue,ls:-1});
     ctx.restore();
@@ -332,9 +332,10 @@ const LDN=[51.5,-.13];
 const ROUTES=[
   {ll:[48.86,2.35],name:'PARIS',arr:1*BEAT,add:0},
   {ll:[40.71,-74.01],name:'NEW YORK',arr:1.75*BEAT,add:1},
-  {ll:[19.43,-99.13],name:'MEXICO CITY',arr:2.25*BEAT,add:1},
-  {ll:[35.68,139.69],name:'TOKYO',arr:3.25*BEAT,add:1},
-  {ll:[-33.87,151.21],name:'SYDNEY',arr:3.75*BEAT,add:1},
+  {ll:[19.43,-99.13],name:'MEXICO CITY',arr:2.25*BEAT,add:0},
+  {ll:[25.20,55.27],name:'DUBAI',arr:3*BEAT,add:1},
+  {ll:[35.68,139.69],name:'TOKYO',arr:3.5*BEAT,add:1},
+  {ll:[-33.87,151.21],name:'SYDNEY',arr:4*BEAT,add:1},
 ];
 const FIRST=ROUTES.find(r=>r.add), LAST=ROUTES[ROUTES.length-1];
 const FLIGHT=.45, CONV=6*BEAT, CENTER=[960,540];
