@@ -22,8 +22,8 @@ DUR = 20.0
 N = int(SR * DUR)
 BEAT = 0.4608571671960374
 START = 0.9567618236322547 + 86 * BEAT          # beat 86 of the track, 40.591s
-T_GLOBE, T_END = 27 * BEAT, 33 * BEAT
-CONV = T_GLOBE + 5 * BEAT                           # globe collapses into one point
+T_GLOBE, T_END = 30 * BEAT, 37 * BEAT
+CONV = T_GLOBE + 6 * BEAT                           # globe collapses into one point
 rng = np.random.default_rng(7)
 
 

@@ -26,15 +26,15 @@ canvas{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;display:block}
    closed-form paths, locked to the beat grid of "Boardroom Drift"
    (130.2 BPM; the cut starts 40.591s into the track, one bar before its last break).
      00.000  hi              — "Hi! I'm Thom Bailly, and I do…" — the dots land on the beat
-     02.304  what I do       — three areas, three beats each, one clear benefit
-     06.452  credentials     — one card: Microsoft, Pinterest, Twitter, Yahoo, one per beat
-     08.756  $300M           — the chart grows, the counter lands: revenue, restructured
-     12.443  5 continents    — routes out of London, the count climbs to 5
-     15.208  the finish      — "Taking your growth strategy from good to unparalleled."
+     02.304  what I do       — three areas, one bar each, one clear benefit
+     07.835  credentials     — one card: Microsoft, Pinterest, Twitter, Yahoo, one per beat
+     10.139  $300M           — $1M to $300M, exponentially, then it holds: revenue, restructured
+     13.826  5 continents    — London to Paris, New York, Mexico City, Tokyo, Sydney
+     17.052  the finish      — "Taking your growth strategy from good to unparalleled."
                                the ball lands as the full stop on the song's final hit
    ===================================================================== */
 const W=1920,H=1080,FPS=60,DUR=20,BEAT=.4608572,EIGHTH=BEAT/2;   // beat period measured from the track
-const T_AREAS=5*BEAT, T_CRED=14*BEAT, T_REV=19*BEAT, T_GLOBE=27*BEAT, T_END=33*BEAT;
+const T_AREAS=5*BEAT, T_CRED=17*BEAT, T_REV=22*BEAT, T_GLOBE=30*BEAT, T_END=37*BEAT;
 // Brand palette sampled from consulting.thomasbailly.com, plus one stretch tone (sky).
 const C={paper:'#FFFFFF',ink:'#030712',blue:'#0073D1',sky:'#4FB0FF',gray:'#6B7280'};
 const DISP='"Bricolage Grotesque"',SANS='"Inter Tight"',MONO='"JetBrains Mono"';
@@ -149,14 +149,14 @@ function sOpen(ctx,lt){
 }
 
 /* =====================================================================
-   02.304 — WHAT I DO   (three areas, three beats each, one clear benefit)
+   02.304 — WHAT I DO   (three areas, one bar each, one clear benefit)
    ===================================================================== */
 const AREAS=[
-  {t:['Commercial','Transformation'],p:'+30% revenue. Same team.'},
-  {t:['European Market','Expansion'],p:'Europe, 18 months faster.'},
-  {t:['Enterprise Negotiation','Training'],p:'Bigger deals. Protected margins.'},
+  {t:['Commercial','Transformation'],p:'Up to +30% revenue. Same team.'},
+  {t:['European Market','Expansion'],p:'Get Europe right, up to 18 months faster.'},
+  {t:['Enterprise Negotiation','Training'],p:'Bigger AOV. Protected margins.'},
 ];
-const A_LEN=3*BEAT, A_X=130, A_W=1620;
+const A_LEN=4*BEAT, A_X=130, A_W=1620;
 function sAreas(ctx,lt,t){
   bg(ctx,C.ink); ctx.globalAlpha=.6; ctx.drawImage(GRID_D,0,0); ctx.globalAlpha=1;
   const gl=ctx.createRadialGradient(560,560,0,560,560,950);
@@ -179,13 +179,16 @@ function sAreas(ctx,lt,t){
     txt(ctx,line,A_X,B+(1-spring(c-.02-i*.06,2.8,.62))*SZ*1.35-out(i)*SZ*1.4,{fam:DISP,w:800,s:SZ,color:'#fff',ls:-SZ*.018});
     ctx.restore();
   });
-  ctx.save(); ctx.beginPath(); ctx.rect(0,PB-96,W,128); ctx.clip();
-  txt(ctx,A.p,A_X,PB+(1-spring(c-.2,2.6,.62))*120-out(2)*128,{fam:DISP,w:800,s:88,it:true,color:C.sky,ls:-2});
+  // one benefit size for all three cards, as large as the longest line allows
+  setFont(ctx,800,100,DISP,true); ctx.letterSpacing='-2px';
+  const PS=Math.min(88,A_W*100/Math.max(...AREAS.map(a=>ctx.measureText(a.p).width))); ctx.letterSpacing='0px';
+  ctx.save(); ctx.beginPath(); ctx.rect(0,PB-PS*1.1,W,PS*1.45); ctx.clip();
+  txt(ctx,A.p,A_X,PB+(1-spring(c-.2,2.6,.62))*PS*1.35-out(2)*PS*1.45,{fam:DISP,w:800,s:PS,it:true,color:C.sky,ls:-PS*.02});
   ctx.restore();
 }
 
 /* =====================================================================
-   06.452 — CREDENTIALS   (one card; the four logos land one per beat)
+   07.835 — CREDENTIALS   (one card; the four logos land one per beat)
    ===================================================================== */
 const LOGOS=[{k:'microsoft',h:100},{k:'pinterest',h:150},{k:'twitter',h:128},{k:'yahoo',h:104}];
 const LOGO_IMG={};
@@ -217,7 +220,7 @@ function sCred(ctx,lt,t){
 }
 
 /* =====================================================================
-   08.756 — $300M, REVENUE RESTRUCTURED   (the chart grows, the counter lands, the camera pushes into the last point)
+   10.139 — $300M, REVENUE RESTRUCTURED   (the chart grows, the counter lands, the camera pushes into the last point)
    ===================================================================== */
 const BARS=14, BV=Array.from({length:BARS},(_,k)=>Math.max(.03,(Math.exp(k*.34)-1)/(Math.exp(13*.34)-1)));
 const CH={X0:900,X1:1760,Y0:820,Y1:250};
@@ -233,7 +236,8 @@ function catmull(P,seg=14){
 function buildChart(){const sp=(CH.X1-CH.X0)/BARS;LINE=catmull(BV.map((v,k)=>[CH.X0+sp*(k+.5),CH.Y0-v*(CH.Y0-CH.Y1)-24]));}
 // odometer column position: lower columns roll continuously, higher ones only on carry
 function colPos(v,k){const p=10**k,q=Math.floor(v/p),r=v-q*p;if(k===0)return v;return q+(r>p-1?r-(p-1):0);}
-const REV_LAND=4*BEAT, REV_LEN=T_GLOBE-T_REV;   // the counter lands on the next downbeat
+const REV_HIT=3*BEAT, REV_LEN=T_GLOBE-T_REV;   // the counter lands on the beat, then holds
+const revGrowth=lt=>prog(lt,.25,REV_HIT);      // 0..1; the value is 300^u, so it grows exponentially
 function sRevenue(ctx,lt){
   bg(ctx,C.paper);
   const P=LINE[LINE.length-1];
@@ -257,7 +261,7 @@ function sRevenue(ctx,lt){
     ctx.fillStyle=k>=BARS-3?C.blue:rgba(C.ink,.88); ctx.beginPath(); ctx.roundRect(x,Y0-h,bw,Math.max(0,h),[6,6,0,0]); ctx.fill();
   }
   // curve draws itself, area fills under it
-  const pl=E.inOutCubic(prog(lt,.8,REV_LAND)), M=LINE.length-1, idx=pl*M, i0=Math.floor(idx);
+  const pl=(Math.pow(300,revGrowth(lt))-1)/299, M=LINE.length-1, idx=pl*M, i0=Math.floor(idx);   // the curve races with the counter
   if(pl>0){
     const hd=i0>=M?LINE[M]:[lerp(LINE[i0][0],LINE[i0+1][0],idx-i0),lerp(LINE[i0][1],LINE[i0+1][1],idx-i0)];
     ctx.beginPath(); ctx.moveTo(LINE[0][0],Y0); for(let i=0;i<=i0;i++) ctx.lineTo(LINE[i][0],LINE[i][1]); ctx.lineTo(hd[0],hd[1]); ctx.lineTo(hd[0],Y0); ctx.closePath();
@@ -268,17 +272,20 @@ function sRevenue(ctx,lt){
     ctx.strokeStyle=rgba(C.blue,.5*(1-ring)); ctx.lineWidth=2; ctx.beginPath(); ctx.arc(hd[0],hd[1],12+26*ring,0,TAU); ctx.stroke();
     ctx.fillStyle=mix(C.blue,C.ink,prog(lt,REV_LEN-.7,REV_LEN-.55)); ctx.beginPath(); ctx.arc(hd[0],hd[1],11,0,TAU); ctx.fill();
   }
-  // odometer: $000M -> $300M, with a punch on landing
-  const la=1-prog(lt,REV_LEN-.9,REV_LEN-.7), v=300*E.inOutCubic(prog(lt,.35,REV_LAND)), SZ=240, BASE=500;
-  const punch=lt>REV_LAND?1+.06*Math.exp(-(lt-REV_LAND)*7)*Math.cos((lt-REV_LAND)*18):1;
+  // odometer: $1M -> $300M, slow at first, then racing (exponential), then it holds
+  const la=1-prog(lt,REV_LEN-.9,REV_LEN-.7), v=Math.pow(300,revGrowth(lt)), SZ=240, BASE=500;
+  const punch=lt>REV_HIT?1+.06*Math.exp(-(lt-REV_HIT)*7)*Math.cos((lt-REV_HIT)*18):1;
   ctx.save(); ctx.globalAlpha*=la; ctx.translate(130,BASE); ctx.scale(punch,punch); ctx.translate(-130,-BASE);
   setFont(ctx,800,SZ*.78,DISP,true); const dw=ctx.measureText('$').width;
-  ctx.fillStyle=C.blue; ctx.fillText('$',126,BASE);
   setFont(ctx,800,SZ,DISP); const cw=ctx.measureText('0').width;
+  // columns appear as the number grows; the dollar sign slides left to make room
+  const vis=[1,clamp(v-9),clamp(v-99)], lead=2-vis[1]-vis[2];
+  setFont(ctx,800,SZ*.78,DISP,true); ctx.fillStyle=C.blue; ctx.fillText('$',126+lead*cw,BASE);
   for(let k=2;k>=0;k--){
+    if(vis[k]<=0) continue;
     const pos=colPos(v,k), d=Math.floor(pos), f=pos-d, cx=130+dw+8+(2-k)*cw;
-    ctx.save(); ctx.beginPath(); ctx.rect(cx,BASE-SZ*.8,cw,SZ*.86); ctx.clip();
-    setFont(ctx,800,SZ,DISP); ctx.textAlign='center'; ctx.fillStyle=(v<10**k&&k>0)?rgba(C.ink,.12):C.ink;
+    ctx.save(); ctx.globalAlpha*=vis[k]; ctx.beginPath(); ctx.rect(cx,BASE-SZ*.8,cw,SZ*.86); ctx.clip();
+    setFont(ctx,800,SZ,DISP); ctx.textAlign='center'; ctx.fillStyle=C.ink;
     ctx.fillText(String(d%10),cx+cw/2,BASE-f*SZ*.9); ctx.fillText(String((d+1)%10),cx+cw/2,BASE+(1-f)*SZ*.9);
     ctx.restore();
   }
@@ -300,7 +307,7 @@ function sRevenue(ctx,lt){
 }
 
 /* =====================================================================
-   12.443 — 5 CONTINENTS   (the data point becomes the globe; the count rolls 1 -> 5)
+   13.826 — 5 CONTINENTS   (the data point becomes the globe; the count rolls 1 -> 5)
    ===================================================================== */
 const GN=5200; const GP=[];
 // 2-degree world land mask (90x180 bits, lat 90..-90, lon -180..180), derived from global-land-mask
@@ -313,21 +320,24 @@ function buildGlobe(){
     GP.push({v:[x,y,z],land:isLand(Math.asin(y)*180/Math.PI,Math.atan2(x,z)*180/Math.PI),h:hash(i*3.7),s:hash(i*5.1)<.5?1:-1});}
 }
 const PITCH=.42,cP=Math.cos(PITCH),sP=Math.sin(PITCH);
-const globeYaw=lt=>.3-.1*lt-1.0*(1-E.outExpo(prog(lt,0,.9)));
+// opens on London, turns west for the Americas, then whips east for Tokyo and Sydney
+const globeYaw=lt=>lerp(.9,-2.05,E.inOutCubic(prog(lt,1.1,1.45)))-.9*(1-E.outExpo(prog(lt,0,.6)))-.08*Math.max(0,lt-1.45);
 const globeGeo=lt=>{const p=E.outExpo(prog(lt,0,.55));return{R:lerp(1350,400,p),cx:lerp(960,1300,p),cy:540};};
 function gproj(v,yaw,g){const cy=Math.cos(yaw),sy=Math.sin(yaw),x=v[0]*cy+v[2]*sy,z1=v[2]*cy-v[0]*sy,y=v[1]*cP-z1*sP,z=v[1]*sP+z1*cP;return[g.cx+g.R*x,g.cy-g.R*y,z,x,y];}
 const ll2v=(lat,lon)=>{const a=lat*Math.PI/180,b=lon*Math.PI/180;return[Math.cos(a)*Math.sin(b),Math.sin(a),Math.cos(a)*Math.cos(b)];};
 function dotStyle(p,z){return z>0?{a:p.land?.5+.5*z:.07+.16*z,s:(p.land?2.5:1.5)*(.6+.4*z)}:{a:p.land?.09:.04,s:1.2};}
 function slerp(a,b,s){const d=Math.acos(clamp(a[0]*b[0]+a[1]*b[1]+a[2]*b[2],-1,1));if(d<1e-6)return a;const sa=Math.sin((1-s)*d)/Math.sin(d),sb=Math.sin(s*d)/Math.sin(d);return[a[0]*sa+b[0]*sb,a[1]*sa+b[1]*sb,a[2]*sa+b[2]*sb];}
 const LDN=[51.5,-.13];
-// one route per new continent; each landing adds one to the count (London = Europe = 1)
+// routes out of London; each landing on a new continent adds one to the count (London = Europe = 1)
 const ROUTES=[
-  {ll:[40.7,-74],name:'NEW YORK',arr:1.5*BEAT},
-  {ll:[-23.5,-46.6],name:'SÃO PAULO',arr:2*BEAT},
-  {ll:[-26.2,28],name:'JOHANNESBURG',arr:2.5*BEAT},
-  {ll:[25.2,55.3],name:'DUBAI',arr:3*BEAT},
+  {ll:[48.86,2.35],name:'PARIS',arr:1*BEAT,add:0},
+  {ll:[40.71,-74.01],name:'NEW YORK',arr:1.75*BEAT,add:1},
+  {ll:[19.43,-99.13],name:'MEXICO CITY',arr:2.25*BEAT,add:1},
+  {ll:[35.68,139.69],name:'TOKYO',arr:3.25*BEAT,add:1},
+  {ll:[-33.87,151.21],name:'SYDNEY',arr:3.75*BEAT,add:1},
 ];
-const FLIGHT=.45, CONV=5*BEAT, CENTER=[960,540];
+const FIRST=ROUTES.find(r=>r.add), LAST=ROUTES[ROUTES.length-1];
+const FLIGHT=.45, CONV=6*BEAT, CENTER=[960,540];
 function arcPoint(A,B,dAng,s){const v=slerp(A,B,s),h=1+(.05+.32*dAng/Math.PI)*Math.sin(Math.PI*s);return[v[0]*h,v[1]*h,v[2]*h];}
 function sGlobe(ctx,lt){
   bg(ctx,C.ink); ctx.globalAlpha=.6; ctx.drawImage(GRID_D,0,0); ctx.globalAlpha=1;
@@ -361,7 +371,7 @@ function sGlobe(ctx,lt){
   const exA=1-prog(lt,CONV-.05,CONV+.15), A=ll2v(...LDN);
   let count=1;
   ROUTES.forEach((r,k)=>{
-    count+=E.inOutCubic(prog(lt,r.arr-.1,r.arr+.1));
+    count+=r.add*E.inOutCubic(prog(lt,r.arr-.1,r.arr+.1));
     if(exA<=0) return;
     const hp=E.inOutCubic(prog(lt,r.arr-FLIGHT,r.arr)); if(hp<=0) return;
     const B=ll2v(...r.ll), dAng=Math.acos(clamp(A[0]*B[0]+A[1]*B[1]+A[2]*B[2],-1,1)), N=32;
@@ -377,8 +387,8 @@ function sGlobe(ctx,lt){
       ctx.fillStyle=`rgba(255,255,255,${exA})`; ctx.beginPath(); ctx.arc(prev[0],prev[1],4,0,TAU); ctx.fill();
     } else {
       const q=gproj(B,yaw,g), pp=prog(lt,r.arr,r.arr+.5);
-      if(pp<1){ctx.strokeStyle=rgba(C.sky,(1-pp)*exA);ctx.lineWidth=2;ctx.beginPath();ctx.arc(q[0],q[1],5+34*E.outCubic(pp),0,TAU);ctx.stroke();}
-      ctx.fillStyle=rgba(C.sky,exA); ctx.beginPath(); ctx.arc(q[0],q[1],4.5,0,TAU); ctx.fill();
+      if(pp<1&&q[2]>0){ctx.strokeStyle=rgba(C.sky,(1-pp)*exA);ctx.lineWidth=2;ctx.beginPath();ctx.arc(q[0],q[1],5+34*E.outCubic(pp),0,TAU);ctx.stroke();}
+      ctx.fillStyle=rgba(C.sky,exA*(q[2]>0?1:.15)); ctx.beginPath(); ctx.arc(q[0],q[1],4.5,0,TAU); ctx.fill();
       txt(ctx,r.name,q[0]+12,q[1]-10,{s:13,ls:2,color:'#fff',w:600,alpha:.9*exA*prog(lt,r.arr,r.arr+.15)*clamp(q[2]*4)});
     }
   });
@@ -393,7 +403,7 @@ function sGlobe(ctx,lt){
   const ta=1-E.inCubic(prog(lt,CONV,CONV+.18)), tx=-E.inCubic(prog(lt,CONV,CONV+.18))*140;
   if(ta>0){
     const SZ=520, BASE=640, rise=(1-spring(lt-.15,1.9,.62))*620;
-    const t5=ROUTES[3].arr+.1, five=lt>t5?1+.07*Math.exp(-(lt-t5)*6)*Math.cos((lt-t5)*16):1;
+    const t5=LAST.arr+.1, five=lt>t5?1+.07*Math.exp(-(lt-t5)*6)*Math.cos((lt-t5)*16):1;
     ctx.save(); ctx.globalAlpha=ta; ctx.beginPath(); ctx.rect(0,BASE-SZ*.8,900,SZ*.86); ctx.clip();
     ctx.translate(120+tx,BASE); ctx.scale(five,five);
     setFont(ctx,800,SZ,DISP,true); ctx.fillStyle=C.blue;
@@ -401,7 +411,7 @@ function sGlobe(ctx,lt){
     ctx.fillText(String(d),0,rise-f*SZ*.92); if(f>0) ctx.fillText(String(d+1),0,rise+(1-f)*SZ*.92);
     ctx.restore();
     ctx.save(); ctx.globalAlpha=ta; ctx.beginPath(); ctx.rect(0,690,900,140); ctx.clip();
-    txt(ctx,'CONTINENTS.',130+tx,800+(1-spring(lt-ROUTES[0].arr+.08,2,.62))*140,{fam:DISP,w:800,s:100,color:'#fff',ls:-2});
+    txt(ctx,'CONTINENTS.',130+tx,800+(1-spring(lt-FIRST.arr+.08,2,.62))*140,{fam:DISP,w:800,s:100,color:'#fff',ls:-2});
     ctx.restore();
   }
   // everything collapses into one point, then the page irises open around it
@@ -412,11 +422,11 @@ function sGlobe(ctx,lt){
 }
 
 /* =====================================================================
-   15.208 — THE FINISH   ("Taking your growth strategy from good to
+   17.052 — THE FINISH   ("Taking your growth strategy from good to
    unparalleled." — the ball lands as the full stop on the song's final hit)
    ===================================================================== */
 const X0=130, FS=112, B_1=480, B_2=620;
-const END_LAND=7*BEAT, END_CTA=8*BEAT;
+const END_LAND=3*BEAT, END_CTA=4*BEAT;
 function riseWords(ctx,words,x,base,size,lt,d0,stag){
   ctx.save(); ctx.beginPath(); ctx.rect(0,base-size*1.02,W,size*1.3); ctx.clip();
   let xx=x;
@@ -429,19 +439,19 @@ function riseWords(ctx,words,x,base,size,lt,d0,stag){
 }
 function sEnd(ctx,lt,t){
   bg(ctx,C.paper); ctx.globalAlpha=.6; ctx.drawImage(GRID_L,0,0); ctx.globalAlpha=1;
-  riseWords(ctx,[['Taking',C.ink],['your',C.ink],['growth',C.ink],['strategy',C.ink]],X0,B_1,FS,lt,.28,.06);
-  let xs=riseWords(ctx,[['from',C.ink],['good',C.ink],['to',C.ink]],X0,B_2,FS,lt,1.0,.08);
+  riseWords(ctx,[['Taking',C.ink],['your',C.ink],['growth',C.ink],['strategy',C.ink]],X0,B_1,FS,lt,.2,.05);
+  let xs=riseWords(ctx,[['from',C.ink],['good',C.ink],['to',C.ink]],X0,B_2,FS,lt,.42,.06);
   // "unparalleled" drops in letter by letter, italic, with a travelling weight wave
   const word='unparalleled', L=[];
   for(let i=0;i<word.length;i++){
-    const wv=800-520*bump((lt-2.0-i*.04)/.45);
+    const wv=800-520*bump((lt-.95-i*.035)/.4);
     setFont(ctx,wv,FS,DISP,true); ctx.letterSpacing='0px'; const cw=ctx.measureText(word[i]).width;
     L.push([word[i],xs,wv]); xs+=cw-3;
   }
   const sheen=prog(lt,END_CTA+.35,END_CTA+.95);
   ctx.save(); ctx.beginPath(); ctx.rect(0,B_2-FS*1.05,W,FS*1.35); ctx.clip();
   L.forEach(([ch,lx,wv],i)=>{
-    const yo=-(1-spring(lt-1.6-i*.03,2.3,.5))*FS*1.3;
+    const yo=-(1-spring(lt-.62-i*.025,2.3,.5))*FS*1.3;
     setFont(ctx,wv,FS,DISP,true); ctx.fillStyle=C.blue; ctx.fillText(ch,lx,B_2+yo);
     if(sheen>0&&sheen<1){
       const sx=lerp(L[0][1]-200,xs+200,sheen), gr=ctx.createLinearGradient(sx-120,0,sx+120,0);
