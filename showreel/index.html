@@ -549,8 +549,8 @@ function sGlobe(ctx,lt,t){
     txt(ctx,scramble('EUROPEAN MARKET EXPANSION',prog(lt,.15,.55),5,Math.floor(t*30)),130+tx,330,{s:14,ls:4,color:C.sky,w:600,alpha:ta});
     ctx.save(); ctx.beginPath(); ctx.rect(0,370,880,420); ctx.clip();
     txt(ctx,'5',110+tx,760+(1-spring(lt-.18,2,.55))*460,{fam:DISP,w:800,s:440,it:true,color:C.blue,alpha:ta});
-    txt(ctx,'CONTINENTS,',400+tx,590+(1-spring(lt-.28,2.3,.6))*200,{fam:DISP,w:800,s:72,color:'#fff',ls:-1,alpha:ta});
-    txt(ctx,'one playbook.',400+tx,680+(1-spring(lt-.36,2.3,.6))*200,{fam:DISP,w:800,s:72,it:true,color:C.sky,ls:-1,alpha:ta});
+    txt(ctx,'CONTINENTS,',400+tx,590+(1-spring(lt-.28,2.3,.6))*320,{fam:DISP,w:800,s:72,color:'#fff',ls:-1,alpha:ta});
+    txt(ctx,'one playbook.',400+tx,680+(1-spring(lt-.36,2.3,.6))*320,{fam:DISP,w:800,s:72,it:true,color:C.sky,ls:-1,alpha:ta});
     ctx.restore();
     txt(ctx,`ROUTES ${String(landed).padStart(2,'0')} / 10`,130+tx,860,{s:14,ls:4,color:'#fff',w:600,alpha:ta});
     if(last) txt(ctx,'LDN — '+last,330+tx,860,{s:14,ls:4,color:'#8B93A3',w:500,alpha:ta});
