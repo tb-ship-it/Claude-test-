@@ -24,14 +24,15 @@ canvas{width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;display:block}
    THOM BAILLY — 15-SECOND REEL
    Every frame is a pure function of time t: springs, easings and
    closed-form paths, locked to the beat grid of "Boardroom Drift"
-   (130.2 BPM; the cut starts 42.434s into the track, one bar before a drop).
-     00.000  the ball        — squash & stretch, the line opens the page on the drop
-     01.843  $300M           — revenue, restructured
-     05.530  5 continents    — routes out of London, the count climbs to 5
-     10.139  the hero card   — the site's own line; the ball lands as the full stop
+   (130.2 BPM; the cut starts 39.208s into the track and ends on its final hit).
+     00.000  experience      — Microsoft, Pinterest, Twitter, Yahoo, one per beat, then together
+     03.226  the ball        — the logos collapse into it; it bounces through the break
+     05.069  $300M           — the page opens on the drop: revenue, restructured
+     08.756  5 continents    — routes out of London, the count climbs to 5
+     14.286  the hero card   — the site's own line; the ball lands as the full stop
    ===================================================================== */
-const W=1920,H=1080,FPS=60,DUR=15,BEAT=.4608572,EIGHTH=BEAT/2;   // beat period measured from the track
-const T_REV=4*BEAT, T_GLOBE=12*BEAT, T_END=22*BEAT;
+const W=1920,H=1080,FPS=60,DUR=20,BEAT=.4608572,EIGHTH=BEAT/2;   // beat period measured from the track
+const T_REV=11*BEAT, T_GLOBE=19*BEAT, T_END=31*BEAT;
 // Brand palette sampled from consulting.thomasbailly.com, plus one stretch tone (sky).
 const C={paper:'#FFFFFF',ink:'#030712',blue:'#0073D1',sky:'#4FB0FF',gray:'#6B7280'};
 const DISP='"Bricolage Grotesque"',SANS='"Inter Tight"',MONO='"JetBrains Mono"';
@@ -88,7 +89,11 @@ const mkCanvas=(w=W,h=H)=>{const c=document.createElement('canvas');c.width=w;c.
 function ballPath(lt,o){
   const {ts,y0,imp,hts,floor,R}=o, yf=floor-R;
   let yc,vy;
-  if(lt<imp[0]){const d=imp[0]-ts,u=clamp((lt-ts)/d);yc=lerp(y0,yf,u*u);vy=2*(yf-y0)*u/d;}
+  if(lt<imp[0]){
+    const d=imp[0]-ts,u=clamp((lt-ts)/d);
+    if(o.arc){yc=lerp(y0,yf,u)-o.arc*4*u*(1-u);vy=(yf-y0-o.arc*4*(1-2*u))/d;}   // hop, then fall
+    else{yc=lerp(y0,yf,u*u);vy=2*(yf-y0)*u/d;}
+  }
   else{
     let k=0; while(k<imp.length-1&&lt>=imp[k+1]) k++;
     if(k<imp.length-1){const d=imp[k+1]-imp[k],v=(lt-imp[k])/d;yc=yf-hts[k]*4*v*(1-v);vy=-hts[k]*4*(1-2*v)/d;}
@@ -120,44 +125,80 @@ function buildCaches(){
 }
 
 /* =====================================================================
-   00.000 — THE BALL   (bounces on the break's beats, stretches on its build)
+   00.000 — EXPERIENCE, THEN THE BALL
+   one logo per beat, the four together, then they collapse into the ball,
+   which bounces on the break's beats and stretches into the page on the drop
    ===================================================================== */
-const S1={ts:.05,y0:-140,imp:[BEAT,2*BEAT,3*BEAT],hts:[260,140],floor:700,R:36};
-const s1x=lt=>lerp(560,960,prog(lt,S1.ts,3*BEAT));
-function sIntro(ctx,lt){
-  const FY=S1.floor,R=S1.R,T3=3*BEAT;
+const LOGOS=[{k:'microsoft',solo:150,row:76},{k:'pinterest',solo:300,row:118},{k:'twitter',solo:250,row:100},{k:'yahoo',solo:190,row:80}];
+const LOGO_IMG={};
+const O_ROW=4*BEAT, O_COLLAPSE=6*BEAT, O_BALL=7*BEAT, O_LINE=10*BEAT;
+const S1={ts:O_BALL,y0:540,arc:190,imp:[8*BEAT,9*BEAT,O_LINE],hts:[240,130],floor:700,R:36};
+function loadLogos(){
+  return Promise.all(LOGOS.map(l=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>{LOGO_IMG[l.k]=im;res();};im.onerror=rej;im.src=`logos/${l.k}.svg`;})));
+}
+function drawLogo(ctx,k,cx,cy,h,s=1,a=1){
+  const im=LOGO_IMG[k]; if(!im||s<=0||a<=0) return;
+  const w=h*im.naturalWidth/im.naturalHeight;
+  ctx.save(); ctx.globalAlpha*=a; ctx.translate(cx,cy); ctx.scale(s,s); ctx.drawImage(im,-w/2,-h/2,w,h); ctx.restore();
+}
+const rowX=k=>960+(k-1.5)*430;
+function sOpen(ctx,lt,t){
+  const FY=S1.floor,R=S1.R;
   bg(ctx,C.ink);
-  ctx.globalAlpha=E.outCubic(prog(lt,0,.8)); ctx.drawImage(GRID_D,0,0); ctx.globalAlpha=1;
-  const gl=ctx.createRadialGradient(960,FY,0,960,FY,780);
-  gl.addColorStop(0,rgba(C.blue,.22*E.outCubic(prog(lt,.2,1.2)))); gl.addColorStop(1,rgba(C.blue,0));
+  ctx.globalAlpha=E.outCubic(prog(lt,0,.6)); ctx.drawImage(GRID_D,0,0); ctx.globalAlpha=1;
+  const gl=ctx.createRadialGradient(960,560,0,960,560,820);
+  gl.addColorStop(0,rgba(C.blue,.2)); gl.addColorStop(1,rgba(C.blue,0));
   ctx.fillStyle=gl; ctx.fillRect(0,0,W,H);
-  const fw=E.outExpo(prog(lt,.1,1))*1500;
+  // label
+  const la=1-prog(lt,O_COLLAPSE,O_COLLAPSE+.2);
+  txt(ctx,scramble('EXPERIENCE',prog(lt,0,.35),2,Math.floor(t*30)),960,300,{s:19,ls:9,color:C.sky,w:600,align:'center',alpha:la});
+  if(lt<O_ROW){
+    // solo shots: a hard cut on every beat, each logo springs into place
+    const k=Math.min(3,Math.floor(lt/BEAT+1e-6)), c=lt-k*BEAT, L=LOGOS[k];
+    const pr=prog(c,0,.5); ctx.strokeStyle=rgba(C.blue,.5*(1-pr)); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(960,540,160+260*E.outCubic(pr),0,TAU); ctx.stroke();
+    drawLogo(ctx,L.k,960,540+(1-spring(c,3,.6))*30,L.solo,1.16-.16*spring(c,3,.5),prog(c,0,.05));
+  } else if(lt<O_BALL){
+    // the four together, then everything collapses into one point
+    LOGOS.forEach((L,k)=>{
+      let x=rowX(k), y=540, h=L.row, s, a=1;
+      if(k===3){const m=E.inOutCubic(prog(lt,O_ROW,O_ROW+.32)); x=lerp(960,x,m); h=lerp(L.solo,L.row,m); s=1;}
+      else s=spring(lt-O_ROW-k*.06,2.8,.55);
+      const cp=E.inCubic(prog(lt,O_COLLAPSE+k*.03,O_COLLAPSE+.34+k*.03));
+      x=lerp(x,960,cp); y=lerp(y,540,cp); s*=1-cp; a=1-cp*.6;
+      drawLogo(ctx,L.k,x,y,h,s,a);
+    });
+    const dr=36*spring(lt-O_COLLAPSE-.12,3,.5);
+    if(dr>0){ctx.fillStyle=C.blue;ctx.beginPath();ctx.arc(960,540,dr,0,TAU);ctx.fill();}
+  }
+  if(lt<O_COLLAPSE) return;
+  // the break: floor, bounces, the line, the page
+  const fw=E.outExpo(prog(lt,O_COLLAPSE,O_COLLAPSE+.8))*1500;
   ctx.fillStyle='rgba(255,255,255,.25)'; ctx.fillRect(960-fw/2,FY,fw,1.5);
-  // impact rings + sparks
   S1.imp.forEach((Ti,k)=>{
-    const bx=s1x(Ti); impactRing(ctx,bx,FY,lt,Ti,[280,200,380][k],C.sky,.8);
+    impactRing(ctx,960,FY,lt,Ti,[260,200,380][k],C.sky,.8);
     const d=lt-Ti;
     if(d>0&&d<.55){
       ctx.strokeStyle=`rgba(255,255,255,${1-d/.55})`; ctx.lineWidth=2; ctx.beginPath();
       for(let j=0;j<12;j++){
         const a=-Math.PI*(.12+.76*hash(k*31+j)), sp=340+560*hash(k*17+j*3);
-        const vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, x=bx+vx*d, y=FY+vy*d+1100*d*d; if(y>FY) continue;
+        const vx=Math.cos(a)*sp, vy=Math.sin(a)*sp, x=960+vx*d, y=FY+vy*d+1100*d*d; if(y>FY) continue;
         ctx.moveTo(x,y); ctx.lineTo(x-vx*.03,y-(vy+2200*d)*.03);
       }
       ctx.stroke();
     }
   });
-  if(lt<T3){
+  if(lt<O_BALL) return;
+  if(lt<O_LINE){
     for(let k=5;k>=1;k--){
       const tt=lt-k*.06; if(tt<S1.ts) continue;
-      ballShape(ctx,s1x(tt),ballPath(tt,S1),R);
+      ballShape(ctx,960,ballPath(tt,S1),R);
       ctx.strokeStyle=`rgba(255,255,255,${.28*(1-k/6)})`; ctx.lineWidth=1.5; ctx.stroke();
     }
-    const b=ballPath(lt,S1);
-    ballShape(ctx,s1x(lt),b,R); ctx.fillStyle=C.blue; ctx.fill();
+    ballShape(ctx,960,ballPath(lt,S1),R); ctx.fillStyle=C.blue; ctx.fill();
   } else {
     // the ball squashes into a line, the line opens into a page
-    const d=lt-T3, p=E.inOutExpo(prog(d,0,.28));
+    const d=lt-O_LINE, p=E.inOutExpo(prog(d,0,.28));
     const bw=lerp(2*R*1.4,2700,p), bh=lerp(2*R*.6,6,p);
     ctx.fillStyle=C.blue; ctx.beginPath(); ctx.roundRect(960-bw/2,FY-bh,bw,bh,bh/2); ctx.fill();
     const q=E.inExpo(prog(d,.22,BEAT));
@@ -170,7 +211,7 @@ function sIntro(ctx,lt){
 }
 
 /* =====================================================================
-   01.843 — $300M, REVENUE RESTRUCTURED
+   05.069 — $300M, REVENUE RESTRUCTURED
    ===================================================================== */
 const BARS=14, BV=Array.from({length:BARS},(_,k)=>Math.max(.03,(Math.exp(k*.34)-1)/(Math.exp(13*.34)-1)));
 const CH={X0:900,X1:1760,Y0:820,Y1:250};
@@ -253,7 +294,7 @@ function sRevenue(ctx,lt){
 }
 
 /* =====================================================================
-   05.530 — 5 CONTINENTS
+   08.756 — 5 CONTINENTS
    ===================================================================== */
 const GN=5200; const GP=[];
 // 2-degree world land mask (90x180 bits, lat 90..-90, lon -180..180), derived from global-land-mask
@@ -280,7 +321,7 @@ const ROUTES=[
   {ll:[-26.2,28],name:'JOHANNESBURG',arr:4*BEAT},
   {ll:[25.2,55.3],name:'DUBAI',arr:5*BEAT},
 ];
-const FLIGHT=.6, CONV=8*BEAT, CENTER=[960,540];
+const FLIGHT=.6, CONV=10*BEAT, CENTER=[960,540];
 function arcPoint(A,B,dAng,s){const v=slerp(A,B,s),h=1+(.05+.32*dAng/Math.PI)*Math.sin(Math.PI*s);return[v[0]*h,v[1]*h,v[2]*h];}
 function sGlobe(ctx,lt){
   bg(ctx,C.ink); ctx.globalAlpha=.6; ctx.drawImage(GRID_D,0,0); ctx.globalAlpha=1;
@@ -368,10 +409,10 @@ function sGlobe(ctx,lt){
 }
 
 /* =====================================================================
-   10.139 — THE HERO CARD   (the site's own line; the ball lands as the full stop)
+   14.286 — THE HERO CARD   (the site's own line; the ball lands as the full stop)
    ===================================================================== */
 const X0=130, FS=118, LH=138, L1=350;
-const END_LAND=4*BEAT, END_POP=6*BEAT, END_CLICK=8*BEAT, END_HIT=10*BEAT;
+const END_LAND=4*BEAT, END_POP=6*BEAT, END_CLICK=8*BEAT, END_HIT=12*BEAT;
 function riseWords(ctx,words,x,base,size,lt,d0,stag){
   ctx.save(); ctx.beginPath(); ctx.rect(0,base-size*1.02,W,size*1.3); ctx.clip();
   let xx=x;
@@ -426,7 +467,7 @@ function sEnd(ctx,lt,t){
   const DOT={ts:1.45,y0:-80,imp:[END_LAND,END_LAND+EIGHTH],hts:[70],floor:B4,R};
   if(lt>=DOT.ts){ballShape(ctx,dotX,ballPath(lt,DOT),R);ctx.fillStyle=C.ink;ctx.fill();}
   DOT.imp.forEach(T=>impactRing(ctx,dotX,B4,lt,T,90,C.blue,.45));
-  impactRing(ctx,dotX,B4,lt,END_HIT,160,C.blue,.6);   // the track's last downbeat
+  impactRing(ctx,dotX,B4,lt,END_HIT,160,C.blue,.6);   // the track's final hit
   // CTA pill + cursor click
   const bp=spring(lt-END_POP,2.6,.5), press=lt>=END_CLICK?1-.07*Math.exp(-(lt-END_CLICK)*14)*Math.cos((lt-END_CLICK)*30):1;
   setFont(ctx,500,34,SANS); const label='Let’s talk', lw=ctx.measureText(label).width, bw=lw+44*2+46, bh=92, bx=X0, by=B4+72;
@@ -452,10 +493,10 @@ function sEnd(ctx,lt,t){
 /* =====================================================================
    frame assembly
    ===================================================================== */
-const SCN=[[0,sIntro],[T_REV,sRevenue],[T_GLOBE,sGlobe],[T_END,sEnd]];
+const SCN=[[0,sOpen],[T_REV,sRevenue],[T_GLOBE,sGlobe],[T_END,sEnd]];
 const sceneAt=tf=>{let i=0;while(i<SCN.length-1&&tf>=SCN[i+1][0]-1e-9)i++;return i;};
 function frameMarks(ctx,t){
-  const a=E.outCubic(prog(t,.05,.6))*(1-E.inCubic(prog(t,14.4,14.9))); if(a<=0) return;
+  const a=E.outCubic(prog(t,.05,.6))*(1-E.inCubic(prog(t,DUR-.6,DUR-.1))); if(a<=0) return;
   ctx.save(); ctx.globalAlpha=a*.9; ctx.globalCompositeOperation='difference'; ctx.strokeStyle='#fff'; ctx.lineWidth=2;
   const m=44,L=24; ctx.beginPath();
   [[m,m,1,1],[W-m,m,-1,1],[m,H-m,1,-1],[W-m,H-m,-1,-1]].forEach(([x,y,sx,sy])=>{ctx.moveTo(x+sx*L,y);ctx.lineTo(x,y);ctx.lineTo(x,y+sy*L);});
@@ -486,6 +527,7 @@ window.reel={
   ready:(async()=>{
     await Promise.all([document.fonts.load(`800 100px ${DISP}`),document.fonts.load(`italic 800 100px ${DISP}`),document.fonts.load(`500 20px ${SANS}`),document.fonts.load(`500 20px ${MONO}`)]);
     await document.fonts.ready;
+    await loadLogos();
     buildCaches(); buildChart(); buildGlobe();
     return true;
   })(),

@@ -22,7 +22,7 @@ const STILLS = arg('stills', null);
 const OUT = path.resolve(ROOT, arg('out', 'stills'));
 const CHROME = arg('chrome', process.env.CHROME || undefined);
 
-const MIME = { '.html': 'text/html', '.woff2': 'font/woff2', '.m4a': 'audio/mp4', '.wav': 'audio/wav' };
+const MIME = { '.html': 'text/html', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.m4a': 'audio/mp4', '.wav': 'audio/wav' };
 const server = http.createServer((req, res) => {
   const p = path.join(ROOT, decodeURIComponent(req.url.split('?')[0]));
   if (!p.startsWith(ROOT) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); res.end(); return; }

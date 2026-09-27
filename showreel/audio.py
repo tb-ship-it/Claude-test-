@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Cuts the reel's soundtrack from "Boardroom Drift" and adds two sound-design touches.
 
-The track sits on a fixed 130.2 BPM grid (beat 0.4608572s). The cut starts on the
-downbeat of the break bar at 42.434s, so the drop lands as the page opens at 1.843s,
-and every visual cue in index.html is placed on this same grid.
+The track sits on a fixed 130.2 BPM grid (beat 0.4608572s). The 20s cut starts on
+beat 83 (39.208s): the logos cut on its beats, the break bar carries the bouncing ball,
+the drop lands as the page opens at 5.069s, and the cut ends on the song's final hit.
+Every visual cue in index.html is placed on this same grid.
 
-    python3 audio.py path/to/Boardroom_Drift.mp3     -> reel.wav (48 kHz, 16-bit stereo)
+    python3 audio.py path/to/Boardroom_Drift.mp3     -> reel.wav (20s, 48 kHz, 16-bit stereo)
 
 Needs numpy, scipy and an ffmpeg binary (FFMPEG env var, imageio-ffmpeg, or PATH).
 """
@@ -17,12 +18,12 @@ from scipy.signal import butter, sosfilt
 from scipy.io import wavfile
 
 SR = 48000
-DUR = 15.0
+DUR = 20.0
 N = int(SR * DUR)
 BEAT = 0.4608571671960374
-START = 0.9567618236322547 + 90 * BEAT          # downbeat of the break bar, 42.434s
-T_GLOBE, T_END = 12 * BEAT, 22 * BEAT
-CONV = T_GLOBE + 8 * BEAT                          # globe collapses into one point
+START = 0.9567618236322547 + 83 * BEAT          # beat 83 of the track, 39.208s
+T_GLOBE, T_END = 19 * BEAT, 31 * BEAT
+CONV = T_GLOBE + 10 * BEAT                          # globe collapses into one point
 CLICK = T_END + 8 * BEAT                           # the CTA click
 rng = np.random.default_rng(7)
 
@@ -78,8 +79,8 @@ if __name__ == '__main__':
     ref = np.sqrt((mix ** 2).mean())
     put(mix, whoosh(.9, 300, 5000), CONV + .1, ref * .9)   # the globe implodes, the page irises open
     put(mix, click(), CLICK, ref * 1.2)                     # the cursor clicks "Let's talk"
-    fade = np.ones(N); fi, fo = int(.005 * SR), int(.25 * SR)
-    fade[:fi] = np.linspace(0, 1, fi); fade[-fo:] = np.linspace(1, 0, fo) ** 1.5
+    fade = np.ones(N); fi, fo = int(.005 * SR), int(.15 * SR)
+    fade[:fi] = np.linspace(0, 1, fi); fade[-fo:] = np.linspace(1, 0, fo) ** 1.5   # the final hit rings, then out
     mix *= fade[:, None]
     peak = np.abs(mix).max()
     if peak > .89:
